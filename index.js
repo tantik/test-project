@@ -34,5 +34,4 @@ Instagram салона в Токио.
     console.error("Ошибка:", error.message);
   }
 }
-
 run();
