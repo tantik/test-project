@@ -8,30 +8,42 @@ async function run() {
   try {
     const leadInput = `
 Instagram салона в Токио.
-Небольшой салон, есть Instagram, есть LINE予約, нет сложной системы.
+Небольшой nail salon.
+Есть Instagram.
+Есть LINE予約.
+Нет сложной внешней системы записи.
+Не сеть.
 `;
 
     console.log("=== АНАЛИЗ ЛИДА ===");
-
     const analysis = await leadAgent.handleTask(leadInput);
     console.log(analysis);
 
-    // Простая проверка (если "да" — идём дальше)
     if (analysis.includes("да")) {
       console.log("\n=== СООБЩЕНИЕ КЛИЕНТУ ===");
 
       const message = await salesAgent.handleTask(`
-Салон: небольшой салон в Токио
-Контакт: Instagram DM
-Напиши первое сообщение
-      `);
+Канал: Instagram DM
+Тип бизнеса: ネイルサロン
+Город: 東京
+
+Наблюдение:
+- посмотрели Instagram
+- дизайн работ выглядит аккуратно и стильно
+- у салона есть LINE予約
+- хотим предложить улучшение процесса записи
+
+Напиши первое сообщение для холодного контакта.
+Оно должно быть вежливым, естественным, персональным и коротким.
+`);
 
       console.log(message);
     } else {
       console.log("\nЛид не подходит, пропускаем.");
     }
   } catch (error) {
-    console.error("Ошибка:", error.message);
+    console.error("Ошибка запуска:", error.message);
   }
 }
+
 run();
