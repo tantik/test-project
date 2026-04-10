@@ -1,0 +1,97 @@
+[
+  {
+    "id": "lead_001",
+    "createdAt": "2026-04-10T07:08:38.809Z",
+    "updatedAt": "2026-04-10T07:08:53.738Z",
+    "source": "instagram",
+    "channel": "instagram_dm",
+    "businessName": "Nail Salon Sakura",
+    "niche": "nail",
+    "city": "Tokyo",
+    "instagramHandle": "@nailsakura",
+    "instagramUrl": "https://instagram.com/example_salon",
+    "instagramBio": "丁寧なネイルケアと季節のデザイン。ご予約はDMまたはLINEから。",
+    "websiteUrl": "",
+    "lineUrl": "",
+    "notes": "Beautiful nail portfolio. Booking seems manual via DM.",
+    "rawText": "\nInstagram:\nhttps://instagram.com/example_salon\n\nОписание:\n- небольшой nail salon\n- есть LINE予約\n- нет полноценной внешней онлайн-системы записи\n- посты с красивым дизайном\n- не сеть\n",
+    "hasInstagram": true,
+    "hasLine": false,
+    "hasWebsite": false,
+    "bookingMethod": "instagram_dm",
+    "postingFrequency": "medium",
+    "strengths": [
+      "丁寧なネイルケア",
+      "季節のデザイン",
+      "美しいネイルポートフォリオ"
+    ],
+    "painPoints": [
+      "予約がDM経由で手動管理されている",
+      "外部のオンライン予約システムがない",
+      "LINE予約はあるが活用されていない可能性"
+    ],
+    "enrichment": {
+      "nicheLabel": "Nail Salon",
+      "tone": "soft-elegant",
+      "offerHint": "LINE booking automation",
+      "bookingMethod": "instagram_dm",
+      "postingFrequency": "medium",
+      "strengths": [
+        "丁寧なネイルケア",
+        "季節のデザイン",
+        "美しいネイルポートフォリオ"
+      ],
+      "painPoints": [
+        "予約がDM経由で手動管理されている",
+        "外部のオンライン予約システムがない",
+        "LINE予約はあるが活用されていない可能性"
+      ],
+      "summary": "Nail Salon Sakuraは東京の小規模ネイルサロンで、丁寧なケアと季節感のあるデザインが強み。Instagramで中程度の頻度で投稿し、美しい作品を紹介しているが、予約は主にInstagramのDMで手動管理されているため効率化の余地がある。",
+      "recommendedAngle": "InstagramのDM予約を自動化し、LINE予約システムを活用することで予約管理の効率化と顧客体験の向上を提案する。"
+    },
+    "scoring": {
+      "parts": {
+        "nicheFit": 100,
+        "digitalPresence": 50,
+        "bookingProblem": 100,
+        "automationPotential": 50,
+        "activitySignal": 70
+      },
+      "totalScore": 77,
+      "grade": "B",
+      "reasons": [
+        "supported niche",
+        "active digital presence on Instagram",
+        "LINE opportunity detected",
+        "manual booking via DM likely",
+        "missing website / booking page"
+      ],
+      "recommendedOffer": "line_booking_automation"
+    },
+    "messages": [
+      {
+        "id": "variant_1",
+        "text": "Nail Salon Sakura様の丁寧なネイルケアと季節のデザインにいつも関心を持って拝見しております。InstagramのDMでのご予約管理について、もしご負担を感じられていましたら、LINE予約の活用で少しでもお手伝いできればと思いご連絡しました。",
+        "score": 70
+      },
+      {
+        "id": "variant_2",
+        "text": "いつもNail Salon Sakura様の美しいネイルポートフォリオを楽しませていただいています。InstagramのDM予約の管理がお忙しいと聞きました。LINEの予約システムを活用して、少しでもスムーズにできる方法をご紹介できれば幸いです。",
+        "score": 70
+      },
+      {
+        "id": "variant_3",
+        "text": "Nail Salon Sakura様の丁寧なネイルケアと季節のデザイン、とても素敵ですね。InstagramのDMでの予約管理がお手間であれば、LINE予約の自動化で効率化し、より快適な予約体験をお届けするお手伝いが可能です。ご興味ありましたらぜひご相談ください。",
+        "score": 70
+      }
+    ],
+    "selectedMessage": {
+      "id": "variant_1",
+      "text": "Nail Salon Sakura様の丁寧なネイルケアと季節のデザインにいつも関心を持って拝見しております。InstagramのDMでのご予約管理について、もしご負担を感じられていましたら、LINE予約の活用で少しでもお手伝いできればと思いご連絡しました。",
+      "score": 70
+    },
+    "polishedMessage": "Nail Salon Sakura様の丁寧なネイルケアと季節ごとのデザインをいつも楽しみに拝見しております。InstagramのDMでのご予約管理にご負担を感じられることがあれば、LINE予約の活用でお力になれればと思い、ご連絡させていただきました。",
+    "recommendedOffer": "line_booking_automation",
+    "status": "completed"
+  }
+]

@@ -1,26 +1,22 @@
-export const BUSINESS_TYPES = {
+export const businessTypes = {
   nail: {
-    key: "nail",
-    label: "ネイルサロン",
-    instagramPoint: "ネイルデザイン",
-    toneHint: "デザインの美しさや丁寧さを自然に伝える"
+    label: "Nail Salon",
+    tone: "soft-elegant",
+    offerHint: "LINE booking automation"
   },
   eyelash: {
-    key: "eyelash",
-    label: "まつ毛サロン",
-    instagramPoint: "目元の仕上がりや雰囲気",
-    toneHint: "目元の印象や仕上がりの美しさを自然に伝える"
+    label: "Eyelash Salon",
+    tone: "polite-beauty",
+    offerHint: "reservation flow improvement"
   },
   hair: {
-    key: "hair",
-    label: "美容室",
-    instagramPoint: "ヘアスタイルやサロンの雰囲気",
-    toneHint: "ヘアスタイルやお店の雰囲気を自然に伝える"
+    label: "Hair Salon",
+    tone: "friendly-professional",
+    offerHint: "customer booking support"
   },
   spa: {
-    key: "spa",
-    label: "スパ・マッサージ",
-    instagramPoint: "落ち着いた雰囲気や癒しの印象",
-    toneHint: "癒しや落ち着いた空気感を自然に伝える"
+    label: "Spa / Relaxation",
+    tone: "calm-premium",
+    offerHint: "premium booking automation"
   }
 };
