@@ -8,12 +8,7 @@ function inferHasLine(rawLead) {
   if (rawLead.hasLine === true) return true;
   if (rawLead.lineUrl) return true;
 
-  const text = [
-    rawLead.instagramBio,
-    rawLead.notes,
-    rawLead.rawText,
-    rawLead.websiteUrl
-  ]
+  const text = [rawLead.instagramBio, rawLead.notes, rawLead.rawText]
     .filter(Boolean)
     .join(" ");
 
@@ -30,21 +25,31 @@ function inferHasLine(rawLead) {
 
 function inferHasWebsite(rawLead) {
   if (rawLead.hasWebsite === true) return true;
-  if (rawLead.websiteUrl) return true;
 
-  const text = [rawLead.instagramBio, rawLead.notes, rawLead.rawText]
+  const websiteUrl = String(rawLead.websiteUrl || "")
+    .trim()
+    .toLowerCase();
+  if (
+    websiteUrl &&
+    !websiteUrl.includes("instagram.com") &&
+    !websiteUrl.includes("line.me")
+  ) {
+    return true;
+  }
+
+  const text = [rawLead.instagramBio, rawLead.notes]
     .filter(Boolean)
-    .join(" ");
+    .join(" ")
+    .toLowerCase();
 
   return containsAny(text, [
-    "http://",
-    "https://",
     "ホームページ",
     "website",
     "web site",
     "webサイト",
     "公式サイト",
-    "予約フォーム"
+    "予約フォーム",
+    "予約ページ"
   ]);
 }
 

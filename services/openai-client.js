@@ -19,10 +19,10 @@ export function extractJsonFromText(text) {
     // ignore
   }
 
-  const fencedMatch = trimmed.match(/```json\s*([\s\S]*?)\s*```/i);
-  if (fencedMatch?.[1]) {
+  const fencedJsonMatch = trimmed.match(/```json\s*([\s\S]*?)\s*```/i);
+  if (fencedJsonMatch?.[1]) {
     try {
-      return JSON.parse(fencedMatch[1]);
+      return JSON.parse(fencedJsonMatch[1]);
     } catch {
       // ignore
     }
@@ -32,15 +32,54 @@ export function extractJsonFromText(text) {
   const lastBrace = trimmed.lastIndexOf("}");
 
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-    const maybeJson = trimmed.slice(firstBrace, lastBrace + 1);
+    const maybeObject = trimmed.slice(firstBrace, lastBrace + 1);
     try {
-      return JSON.parse(maybeJson);
+      return JSON.parse(maybeObject);
+    } catch {
+      // ignore
+    }
+  }
+
+  const firstBracket = trimmed.indexOf("[");
+  const lastBracket = trimmed.lastIndexOf("]");
+
+  if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+    const maybeArray = trimmed.slice(firstBracket, lastBracket + 1);
+    try {
+      return JSON.parse(maybeArray);
     } catch {
       // ignore
     }
   }
 
   return null;
+}
+
+export function extractThreeMessagesFromPlainText(text) {
+  if (!text || typeof text !== "string") return [];
+
+  const cleaned = text.trim();
+
+  const patterns = [
+    /A[:：]\s*([\s\S]*?)(?=\n\s*B[:：]|\n\s*B[）\)]|\n\s*B\.|$)/i,
+    /B[:：]\s*([\s\S]*?)(?=\n\s*C[:：]|\n\s*C[）\)]|\n\s*C\.|$)/i,
+    /C[:：]\s*([\s\S]*?)$/i
+  ];
+
+  const extracted = patterns
+    .map((regex) => cleaned.match(regex)?.[1]?.trim() || "")
+    .filter(Boolean);
+
+  if (extracted.length >= 2) return extracted;
+
+  const blocks = cleaned
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (blocks.length >= 3) return blocks.slice(0, 3);
+
+  return [];
 }
 
 export async function generateText({

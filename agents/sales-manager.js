@@ -1,17 +1,42 @@
 import {
   extractJsonFromText,
+  extractThreeMessagesFromPlainText,
   generateText
 } from "../services/openai-client.js";
 
+function normalizeMessage(value) {
+  return String(value || "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
+}
+
+function buildFallbackMessages(lead) {
+  const name = lead.businessName ? `${lead.businessName}様` : "サロン様";
+
+  if (lead.hasLine) {
+    return [
+      `${name}のInstagramを拝見し、丁寧なネイルケアや季節感のあるデザインがとても素敵だと感じました。ご予約導線も拝見し、LINEを含めた受付の流れをもう少し分かりやすく整えられる余地があるかもしれないと思い、ご連絡いたしました。`,
+      `${name}のInstagramを拝見し、デザインの雰囲気や丁寧な印象がとても素敵だと感じました。すでにLINEもご活用されているようでしたので、受付の流れやご予約導線を少し整理できる可能性があるかもしれないと思い、ご連絡しました。`,
+      `${name}の投稿を拝見し、世界観がとても丁寧で素敵だと感じました。LINEを含めたご予約導線について、もう少し分かりやすく整えられる余地があるかもしれないと思い、ご連絡いたしました。`
+    ];
+  }
+
+  return [
+    `${name}のInstagramを拝見し、丁寧なネイルケアや季節感のあるデザインがとても素敵だと感じました。ご予約導線について、LINEも含めてもう少し分かりやすく整えられる可能性があるかもしれないと思い、ご連絡いたしました。`,
+    `${name}のInstagramを拝見し、デザインの雰囲気がとても印象的でした。ご予約の流れを少し分かりやすくできる余地があるかもしれないと思い、ご連絡しました。`,
+    `${name}の投稿を拝見し、丁寧な世界観がとても素敵だと感じました。ご予約導線をもう少し整えられる可能性があるかもしれないと思い、ご連絡いたしました。`
+  ];
+}
+
 export async function generateSalesMessages(lead) {
   const recommendedDirection = lead.hasLine
-    ? "Do NOT propose introducing LINE. Instead suggest smoothing or organizing the existing reservation flow."
-    : "It is acceptable to gently suggest LINE-based reservation flow as one possible option.";
+    ? "Do NOT propose introducing LINE. Suggest smoothing or organizing the existing reservation flow."
+    : "It is acceptable to gently mention LINE-based reservation flow as one possible option.";
 
   const system = `
 You write first-contact Japanese outreach messages for beauty businesses in Japan.
 
-Return ONLY valid JSON:
+Return valid JSON:
 {
   "A": "string",
   "B": "string",
@@ -29,10 +54,6 @@ Rules:
 - Do not state that they manually manage bookings unless explicitly visible
 - Keep each message concise
 - Prefer observation-based phrasing
-- Use wording like:
-  "〜が見受けられました"
-  "〜できる余地があるかもしれません"
-  "〜を少し整えられるかもしれません"
 - Avoid:
   感動しました
   感激しました
@@ -46,7 +67,6 @@ Rules:
   大変かと思います
   導入することで
   自動化できます
-- JSON only
 `;
 
   const user = `
@@ -90,12 +110,27 @@ C = slightly more value-oriented, but still soft
 
     const parsed = extractJsonFromText(raw);
 
-    if (!parsed) return [];
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const messages = [parsed.A, parsed.B, parsed.C]
+        .map(normalizeMessage)
+        .filter(Boolean);
 
-    return [parsed.A, parsed.B, parsed.C]
-      .map((item) => String(item || "").trim())
+      if (messages.length > 0) {
+        return messages;
+      }
+    }
+
+    const plainTextMessages = extractThreeMessagesFromPlainText(raw)
+      .map(normalizeMessage)
       .filter(Boolean);
-  } catch {
-    return [];
+
+    if (plainTextMessages.length > 0) {
+      return plainTextMessages;
+    }
+
+    return buildFallbackMessages(lead);
+  } catch (error) {
+    console.error("sales-manager error:", error.message);
+    return buildFallbackMessages(lead);
   }
 }
