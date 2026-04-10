@@ -21,6 +21,13 @@ const SOFT_PHRASES = [
   "少しでも"
 ];
 
+const TOO_GENERIC_PHRASES = [
+  "集客や運営",
+  "お手伝いできることがあれば",
+  "ご提案できることがある",
+  "ぜひお話しさせてください"
+];
+
 function scoreSingleMessage(message, lead) {
   let score = 0;
   const text = String(message || "");
@@ -29,7 +36,9 @@ function scoreSingleMessage(message, lead) {
   if (lead.businessName && text.includes(lead.businessName)) score += 15;
   if (text.includes("Instagram")) score += 8;
   if (text.includes("予約")) score += 12;
-  if (text.includes("導線")) score += 8;
+  if (text.includes("導線")) score += 10;
+  if (text.includes("受付の流れ")) score += 8;
+  if (text.includes("分かりやすく整え")) score += 6;
   if (text.includes("もしよろしければ")) score += 10;
 
   SOFT_PHRASES.forEach((phrase) => {
@@ -38,6 +47,10 @@ function scoreSingleMessage(message, lead) {
 
   BAD_PHRASES.forEach((phrase) => {
     if (text.includes(phrase)) score -= 18;
+  });
+
+  TOO_GENERIC_PHRASES.forEach((phrase) => {
+    if (text.includes(phrase)) score -= 10;
   });
 
   if (lead.hasLine) {

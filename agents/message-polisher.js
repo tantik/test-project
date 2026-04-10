@@ -33,8 +33,12 @@ Rules:
 - Keep the original meaning
 - Keep it soft, respectful, realistic
 - Make only light edits
-- Do not make it more emotional
-- Do not make it stronger than the original
+- Do not make it broader than the original
+- Do not introduce vague business topics like 集客, 運営, 売上 unless already present
+- Prefer concrete wording around:
+  予約導線
+  受付の流れ
+  LINEを含めた導線
 - Do not add new claims
 - Do not add phrases like:
   感動しました
