@@ -184,5 +184,78 @@
     "polishedMessage": "Nail Salon Sakura様の素敵なネイルデザインをInstagramで拝見しました。LINEでの予約もされているかと思いますが、予約の流れについて少しご提案できることがあるかもしれません。集客や運営についてお手伝いできることがあれば、ぜひお話しさせてください。",
     "recommendedOffer": "sales_automation_support",
     "status": "completed"
+  },
+  {
+    "id": "lead_001",
+    "createdAt": "2026-04-10T07:41:46.983Z",
+    "updatedAt": "2026-04-10T07:41:50.178Z",
+    "source": "instagram",
+    "channel": "instagram_dm",
+    "businessName": "Nail Salon Sakura",
+    "niche": "nail",
+    "city": "Tokyo",
+    "instagramHandle": "@nailsakura",
+    "instagramUrl": "https://instagram.com/example_salon",
+    "instagramBio": "丁寧なネイルケアと季節のデザイン。ご予約はDMまたはLINEから。",
+    "websiteUrl": "",
+    "lineUrl": "",
+    "notes": "Beautiful nail portfolio. Reservation entry seems to include DM and LINE.",
+    "rawText": "\nInstagram:\nhttps://instagram.com/example_salon\n\nОписание:\n- небольшой nail salon\n- в bio есть LINE予約\n- полноценной внешней онлайн-системы записи не видно\n- посты с красивым дизайном\n- не сеть\n",
+    "hasInstagram": true,
+    "hasLine": true,
+    "hasWebsite": true,
+    "bookingMethod": "instagram_dm",
+    "postingFrequency": "unknown",
+    "strengths": [
+      "丁寧な印象",
+      "デザイン訴求が分かりやすい",
+      "季節感のある訴求",
+      "作品訴求がしっかりしている"
+    ],
+    "painPoints": [
+      "Instagram DM経由の予約導線が見受けられる"
+    ],
+    "enrichment": {
+      "nicheLabel": "Nail Salon",
+      "tone": "soft-elegant",
+      "offerHint": "LINE booking automation",
+      "bookingMethod": "instagram_dm",
+      "postingFrequency": "unknown",
+      "strengths": [
+        "丁寧な印象",
+        "デザイン訴求が分かりやすい",
+        "季節感のある訴求",
+        "作品訴求がしっかりしている"
+      ],
+      "painPoints": [
+        "Instagram DM経由の予約導線が見受けられる"
+      ],
+      "summary": "Nail Salon SakuraはNail Salonとして、外部から見える範囲では予約導線や見せ方を整理できる可能性があります。",
+      "recommendedAngle": "既存の予約導線をより分かりやすく整える提案"
+    },
+    "scoring": {
+      "parts": {
+        "nicheFit": 100,
+        "digitalPresence": 100,
+        "bookingProblem": 80,
+        "automationPotential": 75,
+        "activitySignal": 40
+      },
+      "totalScore": 84,
+      "grade": "A",
+      "reasons": [
+        "supported niche",
+        "active digital presence on Instagram",
+        "LINE presence detected",
+        "reservation flow may rely on DM entry point",
+        "good fit for workflow optimization"
+      ],
+      "recommendedOffer": "line_flow_optimization"
+    },
+    "messages": [],
+    "selectedMessage": null,
+    "polishedMessage": null,
+    "recommendedOffer": "line_flow_optimization",
+    "status": "no-messages"
   }
 ]
