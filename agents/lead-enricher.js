@@ -16,7 +16,9 @@ function fallbackPainPoints(lead) {
   }
 
   if (lead.hasLine && !lead.hasWebsite) {
-    painPoints.push("LINEはあるが予約導線を整理できる余地があるかもしれない");
+    painPoints.push(
+      "LINEやDMを含めた予約導線を整理できる余地があるかもしれない"
+    );
   }
 
   if (!lead.hasLine && !lead.hasWebsite) {
@@ -24,7 +26,7 @@ function fallbackPainPoints(lead) {
   }
 
   if (!lead.hasWebsite) {
-    painPoints.push("外部ページや予約導線の見せ方に改善余地がある可能性");
+    painPoints.push("外部予約ページの見せ方に改善余地がある可能性");
   }
 
   return [...new Set(painPoints)];
@@ -39,6 +41,8 @@ function fallbackStrengths(lead) {
   if (text.includes("季節")) strengths.push("季節感のある訴求");
   if (text.toLowerCase().includes("portfolio"))
     strengths.push("作品訴求がしっかりしている");
+  if (text.includes("LINE") || text.includes("DM"))
+    strengths.push("LINEやDMでの予約導線が見える");
 
   return [...new Set(strengths)];
 }
@@ -51,8 +55,12 @@ function fallbackBookingMethod(lead) {
     .join(" ")
     .toLowerCase();
 
-  if (text.includes("dm")) return "instagram_dm";
-  if (text.includes("line")) return "line";
+  const hasDm = text.includes("dm");
+  const hasLine = text.includes("line");
+
+  if (hasDm) return "instagram_dm";
+  if (hasLine) return "line";
+
   if (
     text.includes("予約フォーム") ||
     text.includes("website") ||
@@ -101,7 +109,13 @@ Important rules:
 - Use only externally visible signals
 - Do not invent internal operations
 - Do not claim that the business lacks LINE if lead.hasLine is true
-- Do not claim that booking is manually managed unless explicitly visible
+- If DM is explicitly visible, prefer bookingMethod = "instagram_dm"
+- Do not drift into broad marketing advice unless directly relevant
+- Prefer pain points around:
+  予約導線
+  受付の流れ
+  外部予約ページ
+  LINEやDMの整理
 - Prefer soft wording such as:
   "〜が見受けられる"
   "〜余地があるかもしれない"
@@ -132,7 +146,7 @@ ${JSON.stringify(
 )}
 `;
 
-  let parsed = null;
+  let parsed;
 
   try {
     const raw = await generateText({
@@ -149,11 +163,18 @@ ${JSON.stringify(
 
   const bookingMethod = parsed?.bookingMethod || inferredBookingMethod;
   const postingFrequency = parsed?.postingFrequency || inferredPostingFrequency;
+
   const strengths = sanitizeArray(parsed?.strengths).length
     ? sanitizeArray(parsed.strengths)
     : fallbackStrengths(lead);
+
   const painPoints = sanitizeArray(parsed?.painPoints).length
-    ? sanitizeArray(parsed.painPoints)
+    ? sanitizeArray(parsed.painPoints).filter(
+        (item) =>
+          !item.includes("集客") &&
+          !item.includes("売上") &&
+          !item.includes("投稿頻度")
+      )
     : fallbackPainPoints({ ...lead, bookingMethod });
 
   const enrichment = {
@@ -170,7 +191,7 @@ ${JSON.stringify(
     recommendedAngle:
       parsed?.recommendedAngle ||
       (lead.hasLine
-        ? "既存の予約導線をより分かりやすく整える提案"
+        ? "既存のLINEやDMを含めた予約導線を分かりやすく整える提案"
         : "予約導線を分かりやすくし、対応負担を軽くする提案")
   };
 
