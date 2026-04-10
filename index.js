@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import { businessTypes } from "./config/business-types.js";
 import { runSalesPipeline } from "./pipeline/run-sales-pipeline.js";
 import { generateSalesMessages } from "./agents/sales-manager.js";
@@ -17,8 +15,7 @@ const rawLead = {
   instagramBio: "丁寧なネイルケアと季節のデザイン。ご予約はDMまたはLINEから。",
   websiteUrl: "",
   lineUrl: "",
-  notes:
-    "Beautiful nail portfolio. Reservation entry seems to include DM and LINE.",
+  notes: "Beautiful nail portfolio. Reservation entry seems to include DM and LINE.",
   rawText: `
 Instagram:
 https://instagram.com/example_salon
@@ -50,7 +47,7 @@ async function main() {
     console.log("\n=== POLISHED MESSAGE ===");
     console.log(result.polishedMessage || "No polished message");
   } catch (error) {
-    console.error("Pipeline error:", error.message);
+    console.error("Pipeline error:", error);
   }
 }
 

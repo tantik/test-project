@@ -3,40 +3,51 @@ import {
   extractThreeMessagesFromPlainText,
   generateText
 } from "../services/openai-client.js";
+import {
+  analyzeMessageQuality,
+  buildHumanFallbackMessages,
+  sanitizeMessageText
+} from "./message-utils.js";
 
-function normalizeMessage(value) {
-  return String(value || "")
-    .replace(/^["']|["']$/g, "")
-    .trim();
+function uniqueMessages(messages) {
+  return [...new Set(messages.map((item) => sanitizeMessageText(item)).filter(Boolean))];
 }
 
-function buildFallbackMessages(lead) {
-  const name = lead.businessName ? `${lead.businessName}様` : "サロン様";
+function buildPromptLead(lead) {
+  return {
+    businessName: lead.businessName,
+    niche: lead.niche,
+    city: lead.city,
+    channel: lead.channel,
+    bookingMethod: lead.bookingMethod,
+    hasLine: lead.hasLine,
+    hasWebsite: lead.hasWebsite,
+    instagramBio: lead.instagramBio,
+    strengths: lead.strengths,
+    painPoints: lead.painPoints,
+    enrichment: lead.enrichment,
+    recommendedOffer: lead.recommendedOffer
+  };
+}
 
-  if (lead.hasLine) {
-    return [
-      `${name}のInstagramを拝見し、丁寧なネイルケアや季節感のあるデザインがとても素敵だと感じました。ご予約導線も拝見し、LINEを含めた受付の流れをもう少し分かりやすく整えられる余地があるかもしれないと思い、ご連絡いたしました。`,
-      `${name}のInstagramを拝見し、デザインの雰囲気や丁寧な印象がとても素敵だと感じました。すでにLINEもご活用されているようでしたので、受付の流れやご予約導線を少し整理できる可能性があるかもしれないと思い、ご連絡しました。`,
-      `${name}の投稿を拝見し、世界観がとても丁寧で素敵だと感じました。LINEを含めたご予約導線について、もう少し分かりやすく整えられる余地があるかもしれないと思い、ご連絡いたしました。`
-    ];
-  }
+function validateAiMessages(messages, lead) {
+  const cleaned = uniqueMessages(messages);
+  if (cleaned.length < 3) return [];
 
-  return [
-    `${name}のInstagramを拝見し、丁寧なネイルケアや季節感のあるデザインがとても素敵だと感じました。ご予約導線について、LINEも含めてもう少し分かりやすく整えられる可能性があるかもしれないと思い、ご連絡いたしました。`,
-    `${name}のInstagramを拝見し、デザインの雰囲気がとても印象的でした。ご予約の流れを少し分かりやすくできる余地があるかもしれないと思い、ご連絡しました。`,
-    `${name}の投稿を拝見し、丁寧な世界観がとても素敵だと感じました。ご予約導線をもう少し整えられる可能性があるかもしれないと思い、ご連絡いたしました。`
-  ];
+  return cleaned
+    .map((message) => analyzeMessageQuality(message, lead))
+    .filter((item) => item.score >= 55)
+    .map((item) => item.text)
+    .slice(0, 3);
 }
 
 export async function generateSalesMessages(lead) {
-  const recommendedDirection = lead.hasLine
-    ? "Do NOT propose introducing LINE. Suggest smoothing or organizing the existing reservation flow."
-    : "It is acceptable to gently mention LINE-based reservation flow as one possible option.";
+  const fallbackMessages = buildHumanFallbackMessages(lead);
 
   const system = `
-You write first-contact Japanese outreach messages for beauty businesses in Japan.
-
-Return valid JSON:
+You write Japanese first-contact outreach messages for small beauty businesses in Japan.
+Your output must sound like a polite real person, not like AI, not like a sales team.
+Return valid JSON only:
 {
   "A": "string",
   "B": "string",
@@ -44,93 +55,51 @@ Return valid JSON:
 }
 
 Rules:
-- Natural Japanese
-- Soft, respectful, realistic tone
-- Suitable for Instagram DM or LINE first outreach
-- No aggressive sales language
-- No exaggerated praise
-- No assumptions about internal operations
-- Do not state that the business is struggling
-- Do not state that they manually manage bookings unless explicitly visible
-- Keep each message concise
-- Prefer observation-based phrasing
-- Avoid:
-  感動しました
-  感激しました
-  感銘を受けました
-  貴サロン
-  御社
-  気軽に
-  こんにちは
-  はじめまして
-  改善できます
-  大変かと思います
-  導入することで
-  自動化できます
-`;
+- Target channel: Instagram DM or LINE first message
+- Natural Japanese only
+- Soft, respectful, neutral
+- No pushy sales tone
+- No excessive praise
+- No corporate wording like 御社 or 貴サロン
+- Do not sound like a proposal deck
+- Do not say 改善できます, 最適化します, 導入, 効率化, 売上, 集客 unless explicitly present
+- Do not assume internal problems
+- Use only visible signals from the lead
+- Mention the business name naturally when possible
+- Keep each message 2 or 3 short sentences
+- Keep each message around 90 to 160 Japanese characters
+- Message A: safest and most polite
+- Message B: slightly warmer and more human
+- Message C: a little more value-aware, but still soft
+- If LINE already exists, do not propose introducing LINE
+- Prefer wording like: ご予約の流れ, 導線, 分かりやすさ, ご参考までに
+- Avoid these phrases: 感動しました, 感激しました, 感銘を受けました, 魅了されています, いつも見ています, ぜひお話し, ご提案が可能です
+`.trim();
 
-  const user = `
-Lead:
-${JSON.stringify(
-  {
-    businessName: lead.businessName,
-    niche: lead.niche,
-    city: lead.city,
-    channel: lead.channel,
-    hasLine: lead.hasLine,
-    hasWebsite: lead.hasWebsite,
-    bookingMethod: lead.bookingMethod,
-    strengths: lead.strengths,
-    painPoints: lead.painPoints,
-    recommendedOffer: lead.recommendedOffer,
-    enrichment: lead.enrichment
-  },
-  null,
-  2
-)}
-
-Extra direction:
-${recommendedDirection}
-
-Task:
-Generate 3 Japanese first outreach messages.
-
-A = safest and most polite
-B = warmer and more human
-C = slightly more value-oriented, but still soft
-`;
+  const user = `Lead: ${JSON.stringify(buildPromptLead(lead), null, 2)}`;
 
   try {
     const raw = await generateText({
       system,
       user,
       model: "gpt-4.1-mini",
-      temperature: 0.7
+      temperature: 0.55
     });
 
     const parsed = extractJsonFromText(raw);
+    const candidateMessages = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? [parsed.A, parsed.B, parsed.C]
+      : extractThreeMessagesFromPlainText(raw);
 
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      const messages = [parsed.A, parsed.B, parsed.C]
-        .map(normalizeMessage)
-        .filter(Boolean);
-
-      if (messages.length > 0) {
-        return messages;
-      }
+    const validMessages = validateAiMessages(candidateMessages, lead);
+    if (validMessages.length >= 3) {
+      return validMessages;
     }
 
-    const plainTextMessages = extractThreeMessagesFromPlainText(raw)
-      .map(normalizeMessage)
-      .filter(Boolean);
-
-    if (plainTextMessages.length > 0) {
-      return plainTextMessages;
-    }
-
-    return buildFallbackMessages(lead);
+    const mixed = uniqueMessages([...validMessages, ...fallbackMessages]);
+    return mixed.slice(0, 3);
   } catch (error) {
     console.error("sales-manager error:", error.message);
-    return buildFallbackMessages(lead);
+    return fallbackMessages;
   }
 }

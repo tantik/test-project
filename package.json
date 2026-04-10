@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start:batch": "node batch-example.js"
   },
   "keywords": [],
   "author": "",

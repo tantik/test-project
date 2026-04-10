@@ -4,14 +4,8 @@ import { scoreLead } from "../agents/lead-scorer.js";
 import { selectBestMessage } from "../agents/message-selector.js";
 import { savePipelineResult } from "../services/logger.js";
 
-export async function runSalesPipeline({
-  rawLead,
-  businessTypes,
-  generateMessages,
-  polishMessage
-}) {
+export async function runSalesPipeline({ rawLead, businessTypes, generateMessages, polishMessage }) {
   let lead = createLead(rawLead);
-
   lead = await enrichLead(lead, businessTypes);
   lead = await scoreLead(lead);
 
@@ -26,7 +20,6 @@ export async function runSalesPipeline({
 
   if (lead.selectedMessage?.text) {
     const polished = await polishMessage(lead, lead.selectedMessage.text);
-
     lead = {
       ...lead,
       polishedMessage: polished,
@@ -36,6 +29,5 @@ export async function runSalesPipeline({
   }
 
   await savePipelineResult(lead);
-
   return lead;
 }

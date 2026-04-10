@@ -15,11 +15,8 @@ async function ensureFile() {
 
 export async function savePipelineResult(result) {
   await ensureFile();
-
   const fileContent = await fs.readFile(RESULTS_FILE, "utf-8");
   const parsed = JSON.parse(fileContent);
-
   parsed.push(result);
-
   await fs.writeFile(RESULTS_FILE, JSON.stringify(parsed, null, 2), "utf-8");
 }

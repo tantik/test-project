@@ -1,84 +1,59 @@
 import { generateText } from "../services/openai-client.js";
+import { analyzeMessageQuality, sanitizeMessageText } from "./message-utils.js";
 
-function sanitizePolishedText(text, fallback) {
-  const result = String(text || "").trim();
-
-  if (!result) return fallback;
-
-  const banned = [
-    "感動しました",
-    "感激しました",
-    "感銘を受けました",
-    "御社",
-    "貴サロン",
-    "大変かと思います"
-  ];
-
-  for (const phrase of banned) {
-    if (result.includes(phrase)) {
-      return fallback;
-    }
-  }
-
-  return result;
+function localPolish(message) {
+  return sanitizeMessageText(message)
+    .replace(/ご連絡いたしました。$/, "ご参考までにご連絡しました。")
+    .replace(/^(.+?)ご参考までに一度ご連絡しました。$/, "$1ご参考までにご連絡しました。")
+    .replace(/ご参考までにご参考までに/g, "ご参考までに")
+    .replace(/思いました。思いました。/g, "思いました。")
+    .replace(/できるかもしれません。ご参考までに/g, "できるかもしれません。ご参考までに")
+    .trim();
 }
 
 export async function polishSalesMessage(lead, message) {
-  const system = `
-You improve Japanese cold outreach messages.
+  const fallback = localPolish(message);
 
-Return only the improved Japanese message text.
+  const system = `
+You lightly polish a Japanese outreach DM.
+Return only the final Japanese message text.
 
 Rules:
-- Keep the original meaning
-- Keep it soft, respectful, realistic
+- Keep the same meaning
+- Keep it human, soft, and modest
 - Make only light edits
-- Do not make it broader than the original
-- Do not introduce vague business topics like 集客, 運営, 売上 unless already present
-- Prefer concrete wording around:
-  予約導線
-  受付の流れ
-  LINEを含めた導線
+- Remove anything that sounds too formal, too salesy, or too AI-like
+- Keep it short enough for Instagram DM
 - Do not add new claims
-- Do not add phrases like:
-  感動しました
-  感激しました
-  感銘を受けました
-  大変かと思います
-  導入することで
-  改善できます
-- Keep it concise
-- Output plain Japanese text only
-`;
+- Do not add 集客, 売上, 効率化, 改善できます, 導入
+- Prefer natural phrases like ご参考までに, もしご興味があれば, 差し支えない範囲で
+`.trim();
 
-  const user = `
-Lead context:
-${JSON.stringify(
-  {
-    businessName: lead.businessName,
-    niche: lead.niche,
-    channel: lead.channel,
-    hasLine: lead.hasLine,
-    recommendedOffer: lead.recommendedOffer
-  },
-  null,
-  2
-)}
-
-Original message:
-${message}
-`;
+  const user = `Lead context: ${JSON.stringify(
+    {
+      businessName: lead.businessName,
+      channel: lead.channel,
+      hasLine: lead.hasLine,
+      bookingMethod: lead.bookingMethod
+    },
+    null,
+    2
+  )}\nOriginal message: ${message}`;
 
   try {
     const result = await generateText({
       system,
       user,
       model: "gpt-4.1-mini",
-      temperature: 0.2
+      temperature: 0.15
     });
 
-    return sanitizePolishedText(result, message);
+    const polished = localPolish(result);
+    const polishedScore = analyzeMessageQuality(polished, lead).score;
+    const originalScore = analyzeMessageQuality(fallback, lead).score;
+
+    return polishedScore >= originalScore ? polished : fallback;
   } catch {
-    return message;
+    return fallback;
   }
 }

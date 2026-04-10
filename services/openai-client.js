@@ -1,11 +1,20 @@
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+let openaiModulePromise = null;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function getClient() {
+  if (!process.env.OPENAI_API_KEY) return null;
+
+  if (!openaiModulePromise) {
+    openaiModulePromise = import("openai").catch(() => null);
+  }
+
+  const imported = await openaiModulePromise;
+  if (!imported?.default) return null;
+
+  return new imported.default({ apiKey: process.env.OPENAI_API_KEY });
 }
 
 export function extractJsonFromText(text) {
@@ -30,7 +39,6 @@ export function extractJsonFromText(text) {
 
   const firstBrace = trimmed.indexOf("{");
   const lastBrace = trimmed.lastIndexOf("}");
-
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
     const maybeObject = trimmed.slice(firstBrace, lastBrace + 1);
     try {
@@ -42,7 +50,6 @@ export function extractJsonFromText(text) {
 
   const firstBracket = trimmed.indexOf("[");
   const lastBracket = trimmed.lastIndexOf("]");
-
   if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
     const maybeArray = trimmed.slice(firstBracket, lastBracket + 1);
     try {
@@ -59,7 +66,6 @@ export function extractThreeMessagesFromPlainText(text) {
   if (!text || typeof text !== "string") return [];
 
   const cleaned = text.trim();
-
   const patterns = [
     /A[:：]\s*([\s\S]*?)(?=\n\s*B[:：]|\n\s*B[)]|\n\s*B\.|$)/i,
     /B[:：]\s*([\s\S]*?)(?=\n\s*C[:：]|\n\s*C[)]|\n\s*C\.|$)/i,
@@ -89,6 +95,11 @@ export async function generateText({
   temperature = 0.7,
   retries = 2
 }) {
+  const client = await getClient();
+  if (!client) {
+    throw new Error("OpenAI client is unavailable. Set OPENAI_API_KEY and install dependencies.");
+  }
+
   let lastError;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
@@ -111,7 +122,6 @@ export async function generateText({
       return String(response.output_text || "").trim();
     } catch (error) {
       lastError = error;
-
       if (attempt < retries) {
         await sleep(700 * (attempt + 1));
       }
