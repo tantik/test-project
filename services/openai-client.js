@@ -61,8 +61,8 @@ export function extractThreeMessagesFromPlainText(text) {
   const cleaned = text.trim();
 
   const patterns = [
-    /A[:：]\s*([\s\S]*?)(?=\n\s*B[:：]|\n\s*B[）\)]|\n\s*B\.|$)/i,
-    /B[:：]\s*([\s\S]*?)(?=\n\s*C[:：]|\n\s*C[）\)]|\n\s*C\.|$)/i,
+    /A[:：]\s*([\s\S]*?)(?=\n\s*B[:：]|\n\s*B[)]|\n\s*B\.|$)/i,
+    /B[:：]\s*([\s\S]*?)(?=\n\s*C[:：]|\n\s*C[)]|\n\s*C\.|$)/i,
     /C[:：]\s*([\s\S]*?)$/i
   ];
 

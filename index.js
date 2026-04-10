@@ -50,7 +50,7 @@ async function main() {
     console.log("\n=== POLISHED MESSAGE ===");
     console.log(result.polishedMessage || "No polished message");
   } catch (error) {
-    console.error("Pipeline error:", error);
+    console.error("Pipeline error:", error.message);
   }
 }
 

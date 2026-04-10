@@ -59,8 +59,8 @@ function scoreSingleMessage(message, lead) {
     if (text.includes("LINE導入")) score -= 25;
     if (text.includes("予約導線を整える")) score += 10;
     if (text.includes("受付の流れ")) score += 8;
-  } else {
-    if (lower.includes("line")) score += 10;
+  } else if (lower.includes("line")) {
+    score += 10;
   }
 
   if (text.includes("必ず") || text.includes("絶対")) score -= 20;
